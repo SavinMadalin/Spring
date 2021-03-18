@@ -14,6 +14,7 @@ public class CarAssembler implements RepresentationModelAssembler<Car, EntityMod
 					linkTo(methodOn(CarController.class).findCarsByPersonId(car.getPerson().getId())).withRel("cars by person"),
 					linkTo(methodOn(CarController.class).findCarsByBrand(car.getBrand())).withRel("cars by brand"),
 					linkTo(methodOn(CarController.class).findAllCars()).withRel("all cars"),
+					linkTo(methodOn(CarController.class).findCarsByCapacity(car.getCapacity())).withRel("cars by capacity"),
 					linkTo(methodOn(CarController.class).getCar(car.getId())).withSelfRel()
 					);
 	}

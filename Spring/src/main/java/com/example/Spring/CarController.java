@@ -2,7 +2,10 @@ package com.example.Spring;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -11,6 +14,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -109,6 +113,29 @@ public class CarController {
 		@DeleteMapping("/delete/car/{id}")
 		public void deleteCar(@PathVariable long id) {
 			carRepository.deleteById(id);
+		}
+		
+		@GetMapping("/car/capacity")
+		public ResponseEntity<?> findCarsByCapacity(@RequestParam int capacity){
+			
+			CompletableFuture<List<Car>> list= carRepository.findCarByCapacity(capacity);
+			List<EntityModel<Car>> entity = new ArrayList<>();
+			try {
+								entity = list.get().stream()
+													.map(carAssembler::toModel)
+													.collect(Collectors.toList());
+		
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+			CollectionModel<EntityModel<Car>> collection = CollectionModel.of(entity,
+					linkTo(methodOn(CarController.class).findCarsByCapacity(capacity)).withSelfRel());
+		
+			return ResponseEntity.ok(collection);
+					
+			
 		}
 		
 		
